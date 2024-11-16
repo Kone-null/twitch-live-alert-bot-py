@@ -1,6 +1,6 @@
 # created by virtualenv automatically
 *.html
-*.txt
+*copy*
 pyvenv.cfg
 /bin
 /lib

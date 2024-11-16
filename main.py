@@ -7,27 +7,15 @@ import asyncio
 from discord import SyncWebhook
 
 
-# channelName = "oliviamonroe"
-
-# contents = requests.get("https://www.twitch.tv/" + channelName).content.decode("utf-8")
-
-
-# # with open('out.html','w',encoding='utf-8') as f:
-# #     f.write(contents)
-
-# if "isLiveBroadcast" in contents:
-#     print(channelName + " is live")
-# else:
-#     print(channelName + " is not live")
 
 
 STREAMER_LIST_FILE: str = "streamers.txt"
 LIVE_CHECK_DELAY: int = (60) * 10  # IN SECONDS
 DISCORD_WEBHOOK_URL: str = (
-    "https://discord.com/api/webhooks/1307137959337918494/29XOtqNHZH72ISMqoXQc10Hpw8MPk4IFvnZ2-1ABZmUiqm1QKsCpFtIu0YXnBTDMjBh9"
+    "URL"
 )
 
-TWITCH_ROLE_ID = "1305260106417569812"
+TWITCH_ROLE_ID:str = "role id"
 
 async def isLive(channelName: str) -> bool:
     try:
