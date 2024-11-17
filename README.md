@@ -59,7 +59,7 @@ SAVE_FILE="save_data.json"
 
 - To add multiple channels from a file:
   ```bash
-  python add-channel.py --file <path/to/list_of_channels.txt>
+  python add-channel.py --file <path/to/list/of/channels.txt>
   ```
 
 ## Running the Bot
