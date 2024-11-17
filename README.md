@@ -2,6 +2,8 @@
 
 The **Twitch Live Alert Bot** is a Discord Webhook bot that periodically checks the live status of Twitch channel(s). It sends an alert to Discord when a channel goes live. Additionally, if a previously live channel is detected as offline, an update message is sent to inform the user that the channel is now offline.
 
+This is a personal project I created to provide a solution to the limitations of current free Twitch live alert Discord bots.
+
 Developed using Python 3.12.
 
 ## Setup
