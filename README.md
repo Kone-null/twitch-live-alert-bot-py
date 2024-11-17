@@ -19,8 +19,8 @@ SAVE_FILE="save_data.json"
 
 ## Add or Follow Channel
 - usage:`python add-channel.py --help`
-- add single channel: `python add-channel.py <channelname>`
-- add many channels: `python add-channel.py <path/to/listofchannels.txt>`
+- add single channel: `python add-channel.py  --channel <channelname>`
+- add many channels: `python add-channel.py --file <path/to/listofchannels.txt>`
 
 ## Use
 run `python3 bot.py`
