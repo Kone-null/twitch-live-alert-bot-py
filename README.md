@@ -9,6 +9,7 @@ Then send an Live alert when a channels is detected as live. Additionally, if an
 3. Create envirnment: `python3 -m venv .`
 4. Install dependacies:`pip install -r requirements.txt`
 5. fill out `channels.txt ` with list of twitch channel names (not urls/links)
+6. OPTIONAL: run `python add-channel.py --file channels.txt`
 
 ## Configuration
 
