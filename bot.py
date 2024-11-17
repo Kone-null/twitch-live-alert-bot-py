@@ -41,24 +41,6 @@ logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
 
-# def verify_dotenv():
-#     if not CHANNEL_LIST_FILE:
-#         logger.error("Channel list (TXT) is not set in '.env'")
-        
-#     if not UPDATE_DELAY:
-#         logger.error("Update Delay is not set in '.env'")
-
-#     if not DISCORD_WEBHOOK_URL:
-#         logger.error("Discord Webhook url is not set in '.env'")
-
-#     if not TWITCH_ROLE_ID:
-#         logger.error("Twitch Role ID is not set in '.env'")
-#     if not SAVE_FILE:
-#         logger.error("Save file (JSON) is not set in '.env'")
-    
-
-# verify_dotenv()
-
 def check_env_vars():
     # List of required environment variables
     required_vars = [
@@ -194,21 +176,6 @@ def load_save_data(save_json_file: str) -> List[Channel]:
         )
         return []
 
-
-# def add_channel(channel_name: str, channels: List[Channel], save_json_file: str) -> None:
-#     """Add a new channel to the list and save the updated list to the file."""
-#     try:
-#         if any(channel.name == channel_name for channel in channels):
-#             logger.warning(f"Channel {channel_name} is already in the list.")
-#             return
-
-#         new_channel = Channel(channel_name)
-#         channels.append(new_channel)
-#         save_data(channels, save_json_file)
-#         logger.info(f"Added new channel {channel_name} to the list.")
-#     except Exception as e:
-#         log_error(e)  # Log error with function name and line
-#         logger.error(f"Error adding channel {channel_name}: {e}")
 
 
 async def main():
