@@ -20,7 +20,11 @@ CHANNEL_LIST="channels.txt"
 UPDATE_DELAY_MIN=
 SAVE_FILE="save_data.json"
 ```
-
+- You can create and get a Discord Webhook url following this [guide](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
+- You can get a role id by following this [guide](https://readybot.io/help/how-to/find-discord-user-and-role-ids).
+- CHANNEL_LIST is the text file that hold a list of channel names (not the channel url).
+- UPDATE_DELAY_MIN is the amount of time (in minutes) inbetween each channel(s) status requests.
+- SAVE_FILE is the JSON file were all the data is stored. `{ 'name' :'twitch', 'live':false} `
 
 ## Add or Follow Channel
 - usage:`python add-channel.py --help`
