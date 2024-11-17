@@ -67,5 +67,5 @@ SAVE_FILE="save_data.json"
 To start the bot, run:
 
 ```bash
-python3 bot.py
+python bot.py
 ```
