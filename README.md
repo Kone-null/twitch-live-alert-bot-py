@@ -1,11 +1,23 @@
 ## Setup
 1. clone repo
-2. fill out `streamers.txt ` with list of twitch channel names (not urls/links)
-3. in main.py:
-   - set `DISCORD_WEBHOOK_URL` to discord webhook url
-   - set `TWITCH_ROLE_ID` to role id set for alerts
-   - adjust `LIVE_CHECK_DELAY` to change delay time in seconds
+2. fill out `channels.txt ` with list of twitch channel names (not urls/links)
 
+## Configuration
+
+Make `.env` file:
+```
+DISCORD_WEBHOOK_URL=""
+TWITCH_ROLE_ID=""
+CHANNEL_LIST="channels.txt"
+UPDATE_DELAY_MIN=
+SAVE_FILE="save_data.json"
+```
+
+
+## Add or Follow Channel
+- usage:`python add-channel.py --help`
+- add single channel: `python add-channel.py <channelname>`
+- add many channels: `python add-channel.py <path/to/listofchannels.txt>`
 
 ## Use
-python3 main.py
+run `python3 bot.py`
