@@ -1,19 +1,35 @@
 # Twitch Live Alert Bot
-Twitch Live Alert Bot is Discord Webhook bot the periodly checks a Twitch channel(s) 'live' status. 
-Then send an Live alert when a channels is detected as live. Additionally, if an already live channel is detected to be offline, an update message will also be sent to let the user know the channel is offline.
 
+The **Twitch Live Alert Bot** is a Discord Webhook bot that periodically checks the live status of Twitch channel(s). It sends an alert to Discord when a channel goes live. Additionally, if a previously live channel is detected as offline, an update message is sent to inform the user that the channel is now offline.
 
 ## Setup
-1. clone repo
-2. cd `twitch-live-alert-bot-py`
-3. Create envirnment: `python3 -m venv .`
-4. Install dependacies:`pip install -r requirements.txt`
-5. fill out `channels.txt ` with list of twitch channel names (not urls/links)
-6. OPTIONAL: run `python add-channel.py --file channels.txt`
+
+1. Clone the repository:
+   ```bash
+   git clone <repo-url>
+   ```
+2. Navigate into the project directory:
+   ```bash
+   cd twitch-live-alert-bot-py
+   ```
+3. Create a virtual environment:
+   ```bash
+   python -m venv .
+   ```
+4. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+5. Fill out `channels.txt` with a list of Twitch channel names (not URLs/links).
+6. OPTIONAL: Run the following command to add channels from a file:
+   ```bash
+   python add-channel.py --file channels.txt
+   ```
 
 ## Configuration
 
-Make `.env` file:
+Create a `.env` file with the following configuration:
+
 ```
 DISCORD_WEBHOOK_URL=""
 TWITCH_ROLE_ID=""
@@ -21,16 +37,35 @@ CHANNEL_LIST="channels.txt"
 UPDATE_DELAY_MIN=
 SAVE_FILE="save_data.json"
 ```
-- You can create and get a Discord Webhook url following this [guide](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
-- You can get a role id by following this [guide](https://readybot.io/help/how-to/find-discord-user-and-role-ids).
-- CHANNEL_LIST is the text file that hold a list of channel names (not the channel url).
-- UPDATE_DELAY_MIN is the amount of time (in minutes) inbetween each channel(s) status requests.
-- SAVE_FILE is the JSON file were all the data is stored. `{ 'name' :'twitch', 'live':false} `
 
-## Add or Follow Channel
-- usage:`python add-channel.py --help`
-- add single channel: `python add-channel.py  --channel <channelname>`
-- add many channels: `python add-channel.py --file <path/to/listofchannels.txt>`
+### Configuration Options:
+- **DISCORD_WEBHOOK_URL**: The URL of the Discord webhook to send alerts to. You can create a webhook by following this [guide](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
+- **TWITCH_ROLE_ID**: The Discord role ID to mention in the alert. You can get the role ID by following this [guide](https://readybot.io/help/how-to/find-discord-user-and-role-ids).
+- **CHANNEL_LIST**: The path to the text file that contains the list of Twitch channel names (not URLs).
+- **UPDATE_DELAY_MIN**: The amount of time (in minutes) between each check for channel status.
+- **SAVE_FILE**: The JSON file where the bot stores data, e.g., `{ 'name': 'twitch', 'live': false }`.
 
-## Use
-run `python3 bot.py`
+## Add or Follow Channels
+
+- To see usage instructions, run:
+  ```bash
+  python add-channel.py --help
+  ```
+
+- To add a single channel:
+  ```bash
+  python add-channel.py --channel <channel_name>
+  ```
+
+- To add multiple channels from a file:
+  ```bash
+  python add-channel.py --file <path/to/list_of_channels.txt>
+  ```
+
+## Running the Bot
+
+To start the bot, run:
+
+```bash
+python3 bot.py
+```
