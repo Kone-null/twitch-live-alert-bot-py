@@ -13,6 +13,22 @@ load_dotenv()
 CHANNEL_LIST_FILE: str = os.getenv("CHANNEL_LIST")
 SAVE_FILE: str = os.getenv("SAVE_FILE")
 
+def check_env_vars():
+    # List of required environment variables
+    required_vars = [
+        "CHANNEL_LIST",
+        "SAVE_FILE"
+    ]
+
+    # Check for missing environment variables
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+
+    # If any environment variables are missing, print them and exit
+    if missing_vars:
+        print(f"Missing environment variables: {', '.join(missing_vars)}")
+        sys.exit(1)
+check_env_vars()
+
 
 def is_live(channel_name: str) -> bool:
     """Check if the Twitch channel is live."""

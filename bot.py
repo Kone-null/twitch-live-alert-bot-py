@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import time
 import httpx
@@ -39,6 +40,43 @@ file_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
+
+# def verify_dotenv():
+#     if not CHANNEL_LIST_FILE:
+#         logger.error("Channel list (TXT) is not set in '.env'")
+        
+#     if not UPDATE_DELAY:
+#         logger.error("Update Delay is not set in '.env'")
+
+#     if not DISCORD_WEBHOOK_URL:
+#         logger.error("Discord Webhook url is not set in '.env'")
+
+#     if not TWITCH_ROLE_ID:
+#         logger.error("Twitch Role ID is not set in '.env'")
+#     if not SAVE_FILE:
+#         logger.error("Save file (JSON) is not set in '.env'")
+    
+
+# verify_dotenv()
+
+def check_env_vars():
+    # List of required environment variables
+    required_vars = [
+        "DISCORD_WEBHOOK_URL",
+        "TWITCH_ROLE_ID",
+        "CHANNEL_LIST",
+        "UPDATE_DELAY_MIN",
+        "SAVE_FILE"
+    ]
+
+    # Check for missing environment variables
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+
+    # If any environment variables are missing, print them and exit
+    if missing_vars:
+        logger.error(f"Missing environment variables: {', '.join(missing_vars)}")
+        sys.exit(1)
+check_env_vars()
 
 def log_error(e: Exception):
     """Logs detailed error information including function and line number."""
