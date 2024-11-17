@@ -1,6 +1,9 @@
 ## Setup
 1. clone repo
-2. fill out `channels.txt ` with list of twitch channel names (not urls/links)
+2. cd `twitch-live-alert-bot-py`
+3. Create envirnment: `python3 -m venv .`
+4. Install dependacies:`pip install -r requirements.txt`
+5. fill out `channels.txt ` with list of twitch channel names (not urls/links)
 
 ## Configuration
 
