@@ -128,7 +128,9 @@ def send_webhook(channel_name: str, status: str) -> None:
 
         offline_message = f"<@&{TWITCH_ROLE_ID}> <t:{detect_time}> <t:{detect_time}:R> - {channel_name} is {status}!"
 
-        webhook.send(live_message if status == "live" else offline_message)
+
+        message = live_message if status == "live" else offline_message
+        webhook.send(message)
 
         logger.info(f"Sent {status} status for {channel_name} to Discord.")
     except Exception as e:
