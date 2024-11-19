@@ -48,7 +48,7 @@ def check_env_vars():
         "TWITCH_ROLE_ID",
         "CHANNEL_LIST",
         "UPDATE_DELAY_MIN",
-        "SAVE_FILE"
+        "SAVE_FILE",
     ]
 
     # Check for missing environment variables
@@ -58,7 +58,10 @@ def check_env_vars():
     if missing_vars:
         logger.error(f"Missing environment variables: {', '.join(missing_vars)}")
         sys.exit(1)
+
+
 check_env_vars()
+
 
 def log_error(e: Exception):
     """Logs detailed error information including function and line number."""
@@ -116,8 +119,17 @@ def get_channels(filename: str) -> List[str]:
 def send_webhook(channel_name: str, status: str) -> None:
     """Send a webhook notification to Discord."""
     try:
+        detect_time = int(time.time())
         webhook = SyncWebhook.from_url(DISCORD_WEBHOOK_URL)
-        webhook.send(f"<@&{TWITCH_ROLE_ID}> {channel_name} is {status}!")
+        
+        live_message = f"<@&{TWITCH_ROLE_ID}> <t:{detect_time}:F> <t:{detect_time}:R> - [{channel_name}]({"https://www.twitch.tv/"+channel_name}) is {status}!"
+
+        # live_message = f"<@&{TWITCH_ROLE_ID}> <t:{detect_time}> <t:{detect_time}:R> - {channel_name} is {status}!"
+
+        offline_message = f"<@&{TWITCH_ROLE_ID}> <t:{detect_time}> <t:{detect_time}:R> - {channel_name} is {status}!"
+
+        webhook.send(live_message if status == "live" else offline_message)
+
         logger.info(f"Sent {status} status for {channel_name} to Discord.")
     except Exception as e:
         log_error(e)  # Log error with function name and line
@@ -137,6 +149,10 @@ def countdown(seconds: float) -> None:
 def save_data(channels: List[Channel], save_json_file: str) -> None:
     """Save the current channel statuses to a JSON file."""
     try:
+        # data = {
+        #     "meta": {"saved": time.time()},
+        #     "channels": [channel.data() for channel in channels],
+        # }
         with open(save_json_file, "w") as json_file:
             json.dump([channel.data() for channel in channels], json_file, indent=4)
         logger.info(f"Data saved successfully to {save_json_file}.")
@@ -175,7 +191,6 @@ def load_save_data(save_json_file: str) -> List[Channel]:
             f"An unexpected error occurred while loading {save_json_file}: {e}"
         )
         return []
-
 
 
 async def main():
