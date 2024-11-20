@@ -67,6 +67,8 @@ TWITCH_ROLE_ID=""
 CHANNEL_LIST="channels.txt"
 UPDATE_DELAY_MIN=
 SAVE_FILE="save_data.json"
+CLIENT_ID=
+AUTH_KEY=
 ```
 
 ### Configuration Details:
@@ -75,6 +77,8 @@ SAVE_FILE="save_data.json"
 - **CHANNEL_LIST**: The path to the file containing the list of Twitch channel names.
 - **UPDATE_DELAY_MIN**: The interval (in minutes) between live status checks.
 - **SAVE_FILE**: The JSON file where the bot saves its state (e.g., `{"name": "twitch", "live": false}`).
+- **CLIENT_ID**: The Twitch API APP Client ID.
+- **AUTH_KEY**: The authentication key give to Twitch API APPs for Authorization.
 
 ---
 
