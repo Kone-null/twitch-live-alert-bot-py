@@ -3,7 +3,9 @@ import json
 import sys
 import httpx
 from typing import List
+
 from twitch.channel import Channel
+from datetime import datetime, timedelta
 import argparse
 from dotenv import load_dotenv
 
@@ -12,12 +14,16 @@ load_dotenv()
 
 CHANNEL_LIST_FILE: str = os.getenv("CHANNEL_LIST")
 SAVE_FILE: str = os.getenv("SAVE_FILE")
+CLIENT_ID: str = os.getenv("CLIENT_ID")
+AUTH_KEY: str = os.getenv("AUTH_KEY")
 
 def check_env_vars():
     # List of required environment variables
     required_vars = [
         "CHANNEL_LIST",
-        "SAVE_FILE"
+        "SAVE_FILE",
+        "AUTH_KEY",
+        "CLIENT_ID",
     ]
 
     # Check for missing environment variables
@@ -30,19 +36,97 @@ def check_env_vars():
 check_env_vars()
 
 
+
+
+# def is_live(channel_name: str) -> bool:
+#     """Check if the Twitch channel is live."""
+#     try:
+#         response = httpx.get(f"https://www.twitch.tv/{channel_name}")
+#         response.raise_for_status()
+#         return "isLiveBroadcast" in response.text
+#     except httpx.RequestError as exc:
+#         print(f"Request error for channel {channel_name}: {exc}")
+#     except httpx.HTTPStatusError as exc:
+#         print(f"HTTP error for channel {channel_name}: {exc.response.status_code}")
+#     except Exception as exc:
+#         print(f"Unexpected error while checking {channel_name}: {exc}")
+#     return False
 def is_live(channel_name: str) -> bool:
     """Check if the Twitch channel is live."""
     try:
-        response = httpx.get(f"https://www.twitch.tv/{channel_name}")
+        
+        # response = await client.get(f"https://www.twitch.tv/{channel_name}")
+
+        headers = {"Client-ID": CLIENT_ID, "Authorization": f"Bearer {AUTH_KEY}"}
+
+        url = f"https://api.twitch.tv/helix/search/channels?query={channel_name}"
+        response = httpx.get(url=url, headers=headers)
         response.raise_for_status()
-        return "isLiveBroadcast" in response.text
+
+        # Parse the JSON response
+        data = response.json().get("data", [])
+
+        # Search for the channel in the response data
+        for channel in data:
+            if channel.get("broadcaster_login", "").lower() == channel_name.lower():
+                is_live = channel.get("is_live", None)
+                
+                if is_live is None:
+                    
+                    save_file_with_auto_dirs(
+                        channelname=channel_name, 
+                        content=channel, 
+                        status="null"
+                    )
+                return is_live
+        return None
     except httpx.RequestError as exc:
+        
         print(f"Request error for channel {channel_name}: {exc}")
+        return False
     except httpx.HTTPStatusError as exc:
-        print(f"HTTP error for channel {channel_name}: {exc.response.status_code}")
+        # log_error(exc)  # Log error with function name and line
+        print(
+            f"HTTP error for channel {channel_name}: {exc.response.status_code}"
+        )
+        return False
     except Exception as exc:
-        print(f"Unexpected error while checking {channel_name}: {exc}")
-    return False
+        # log_error(exc)  # Log error with function name and line
+        print(
+            f"An unexpected error occurred while checking the status of {channel_name}: {exc}"
+        )
+        return False
+
+def save_file_with_auto_dirs(channelname, content, status):
+    try:
+        # Extract the directory path
+        # Get the current time
+        now = datetime.now()
+
+        formatted_time = now.strftime("%Y.%m.%dT%H.%M.%S")
+
+        outfile = f"{channelname}[{formatted_time}]({status}).json"
+        file_path = os.path.join("troubleshooting", "status-responses" ,channelname, outfile)
+        dir_path = os.path.dirname(file_path)
+
+        # Create the directories if they don't exist
+        os.makedirs(dir_path, exist_ok=True)
+
+        # Write the content to the file
+        # with open(file_path, "w") as file:
+        #     file.write(content)
+        # Write the content to the file
+        with open(file_path, "w") as file:
+            json.dump(content, file, indent=4)  # `content` must be a dictionary or list
+
+    except OSError as e:
+        print(f"OS error occurred while saving the file: {e}")
+        # print(f"Failed to save the file: {e}")
+
+    except Exception as e:
+        print(f"Unexpected error occurred: {e}")
+        # print(f"An unexpected error occurred: {e}")
+
 
 
 def load_save_data(save_json_file: str) -> List[Channel]:

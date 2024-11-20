@@ -6,6 +6,7 @@ import httpx
 import asyncio
 import logging
 import traceback
+from datetime import datetime, timedelta
 from discord import SyncWebhook
 from dotenv import load_dotenv
 from typing import List
@@ -22,6 +23,9 @@ UPDATE_DELAY: float = float(os.getenv("UPDATE_DELAY_MIN", 1)) * 60  # Convert to
 DISCORD_WEBHOOK_URL: str = os.getenv("DISCORD_WEBHOOK_URL")
 TWITCH_ROLE_ID: str = os.getenv("TWITCH_ROLE_ID")
 SAVE_FILE: str = os.getenv("SAVE_FILE")
+CLIENT_ID: str = os.getenv("CLIENT_ID")
+AUTH_KEY: str = os.getenv("AUTH_KEY")
+
 
 # Set up logging
 logger = logging.getLogger()
@@ -49,6 +53,8 @@ def check_env_vars():
         "CHANNEL_LIST",
         "UPDATE_DELAY_MIN",
         "SAVE_FILE",
+        "AUTH_KEY",
+        "CLIENT_ID",
     ]
 
     # Check for missing environment variables
@@ -72,15 +78,66 @@ def log_error(e: Exception):
     logger.error("".join(tb_lines))
 
 
+def save_file_with_auto_dirs(channelname, content, status):
+    try:
+        # Extract the directory path
+        # Get the current time
+        now = datetime.now()
+
+        formatted_time = now.strftime("%Y.%m.%dT%H.%M.%S")
+
+        outfile = f"{channelname}[{formatted_time}]({status}).json"
+        file_path = os.path.join("troubleshooting", "status-responses" ,channelname, outfile)
+        dir_path = os.path.dirname(file_path)
+
+        # Create the directories if they don't exist
+        os.makedirs(dir_path, exist_ok=True)
+
+        # Write the content to the file
+        # with open(file_path, "w") as file:
+        #     file.write(content)
+        # Write the content to the file
+        with open(file_path, "w") as file:
+            json.dump(content, file, indent=4)  # `content` must be a dictionary or list
+
+    except OSError as e:
+        logging.error(f"OS error occurred while saving the file: {e}")
+        # print(f"Failed to save the file: {e}")
+
+    except Exception as e:
+        logging.error(f"Unexpected error occurred: {e}")
+        # print(f"An unexpected error occurred: {e}")
+
+
 async def is_live(channel_name: str) -> bool:
     """Check if the Twitch channel is live."""
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"https://www.twitch.tv/{channel_name}")
+            # response = await client.get(f"https://www.twitch.tv/{channel_name}")
+
+            headers = {"Client-ID": CLIENT_ID, "Authorization": f"Bearer {AUTH_KEY}"}
+
+            url = f"https://api.twitch.tv/helix/search/channels?query={channel_name}"
+            response = await client.get(url=url, headers=headers)
             response.raise_for_status()
 
-        return "isLiveBroadcast" in response.text
+            # Parse the JSON response
+            data = response.json().get("data", [])
 
+            # Search for the channel in the response data
+            for channel in data:
+                if channel.get("broadcaster_login", "").lower() == channel_name.lower():
+                    is_live = channel.get("is_live", None)
+                    
+                    if is_live is None:
+                        
+                        save_file_with_auto_dirs(
+                            channelname=channel_name, 
+                            content=channel, 
+                            status="null"
+                        )
+                    return is_live
+        return None
     except httpx.RequestError as exc:
         log_error(exc)  # Log error with function name and line
         logger.error(f"Request error for channel {channel_name}: {exc}")
@@ -128,7 +185,6 @@ def send_webhook(channel_name: str, status: str) -> None:
 
         offline_message = f"<@&{TWITCH_ROLE_ID}> <t:{detect_time}> <t:{detect_time}:R> - {channel_name} is {status}!"
 
-
         message = live_message if status == "live" else offline_message
         webhook.send(message)
 
@@ -146,6 +202,37 @@ def countdown(seconds: float) -> None:
     except Exception as e:
         log_error(e)  # Log error with function name and line
         logger.error(f"Error in countdown function: {e}")
+
+def update_time():
+    """
+    Checks if the current time is at an interval of 5 minutes.
+    Logs the next update time.
+    
+    Returns:
+        bool: True if the current minute is divisible by the interval, otherwise False.
+    """
+    minute_interval: int = 5
+
+    # Get the current time
+    now = datetime.now()
+
+    # Calculate the next update time
+    update_time = now + timedelta(minutes=minute_interval)
+    
+    # Extract the current minute
+    minute_now = now.minute
+
+    # Format the next update time for logging
+    formatted_time = update_time.strftime("%Y-%m-%dT%H:%M:%S")
+
+    # Log the next update time
+    logger.info(f"Waiting for next update @ {formatted_time}")
+
+    # Check if the current minute is divisible by the interval
+    if (minute_now % minute_interval) == 0:
+        return True
+    return False
+
 
 
 def save_data(channels: List[Channel], save_json_file: str) -> None:
@@ -212,14 +299,26 @@ async def main():
                     continue
 
                 is_channel_live = await is_live(channel.name)
-                if is_channel_live and not channel.live:
-                    logger.info(f"{channel.name} is live!")
+    
+                if is_channel_live is None:
+                    logger.info(f"{channel.name}'s channel status not found!")
+                    continue
+
+                if is_channel_live and not channel.live: # channel is live
+                    logger.info(f"{channel.name} is now live!")
                     channel.set_live()
                     send_webhook(channel.name, "live")
-                elif not is_channel_live and channel.live:
-                    logger.info(f"{channel.name} is offline!")
+                # elif is_channel_live and channel.live: # Channel is already live
+                #     logger.info(f"{channel.name} is live.")
+
+                elif not is_channel_live and channel.live: # channel becomes offline
+                    logger.info(f"{channel.name} is now offline!")
                     channel.set_offline()
                     send_webhook(channel.name, "offline")
+
+                # elif not is_channel_live and not channel.live: # channel was already off
+                #     logger.info(f"{channel.name} is offline.")
+
 
             logger.info(f"Waiting for {UPDATE_DELAY} seconds before the next check...")
             countdown(UPDATE_DELAY)

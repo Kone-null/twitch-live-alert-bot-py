@@ -1,4 +1,5 @@
 # created by virtualenv automatically
+.DS_Store
 *.html
 *copy*
 pyvenv.cfg
@@ -9,3 +10,5 @@ channels.txt
 *.json
 *.log
 __pycache__
+/responses*
+/testing
