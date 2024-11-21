@@ -308,16 +308,16 @@ async def main():
                     logger.info(f"{channel.name} is now live!")
                     channel.set_live()
                     send_webhook(channel.name, "live")
-                # elif is_channel_live and channel.live: # Channel is already live
-                #     logger.info(f"{channel.name} is live.")
+                elif is_channel_live and channel.live: # Channel is already live
+                    logger.info(f"{channel.name} is live.")
 
                 elif not is_channel_live and channel.live: # channel becomes offline
                     logger.info(f"{channel.name} is now offline!")
                     channel.set_offline()
                     send_webhook(channel.name, "offline")
 
-                # elif not is_channel_live and not channel.live: # channel was already off
-                #     logger.info(f"{channel.name} is offline.")
+                elif not is_channel_live and not channel.live: # channel was already off
+                    logger.info(f"{channel.name} is offline.")
 
 
             logger.info(f"Waiting for {UPDATE_DELAY} seconds before the next check...")
