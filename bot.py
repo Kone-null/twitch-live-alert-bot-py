@@ -113,14 +113,22 @@ async def is_live(channel_name: str) -> bool:
     """Check if the Twitch channel is live."""
     try:
         async with httpx.AsyncClient() as client:
-            # response = await client.get(f"https://www.twitch.tv/{channel_name}")
-
             headers = {"Client-ID": CLIENT_ID, "Authorization": f"Bearer {AUTH_KEY}"}
-
             url = f"https://api.twitch.tv/helix/search/channels?query={channel_name}"
-            response = await client.get(url=url, headers=headers)
-            response.raise_for_status()
-
+            
+            # Retry logic in case of transient issues
+            for attempt in range(3):  # Retry up to 3 times
+                try:
+                    response = await client.get(url=url, headers=headers, timeout=10.0)
+                    response.raise_for_status()
+                    break  # If successful, exit retry loop
+                except (httpx.ConnectError, httpx.ReadTimeout) as exc:
+                    logger.warning(f"Attempt {attempt + 1}: Connection issue: {exc}")
+                    if attempt < 2:  # If not the last attempt, wait and retry
+                        await asyncio.sleep(2 ** attempt)
+                    else:
+                        raise  # After 3 attempts, raise the exception
+            
             # Parse the JSON response
             data = response.json().get("data", [])
 
@@ -130,30 +138,28 @@ async def is_live(channel_name: str) -> bool:
                     is_live = channel.get("is_live", None)
                     
                     if is_live is None:
-                        
                         save_file_with_auto_dirs(
                             channelname=channel_name, 
                             content=channel, 
                             status="null"
                         )
                     return is_live
-        return None
+
+        return False  # If the channel wasn't found
     except httpx.RequestError as exc:
-        log_error(exc)  # Log error with function name and line
-        logger.error(f"Request error for channel {channel_name}: {exc}")
+        logger.error(f"Request error for channel '{channel_name}': {exc}")
         return False
     except httpx.HTTPStatusError as exc:
-        log_error(exc)  # Log error with function name and line
         logger.error(
-            f"HTTP error for channel {channel_name}: {exc.response.status_code}"
+            f"HTTP status error for channel '{channel_name}': {exc.response.status_code}, {exc.response.text}"
         )
         return False
     except Exception as exc:
-        log_error(exc)  # Log error with function name and line
         logger.error(
-            f"An unexpected error occurred while checking the status of {channel_name}: {exc}"
+            f"Unexpected error while checking the status of '{channel_name}': {exc}"
         )
         return False
+
 
 
 def get_channels(filename: str) -> List[str]:

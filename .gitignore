@@ -10,5 +10,8 @@ channels.txt
 *.json
 *.log
 __pycache__
+/analytics
 /responses*
 /testing
+
+
