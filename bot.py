@@ -320,10 +320,11 @@ async def main():
                     logger.info(f"{channel.name} is offline.")
 
 
+            save_data(channels, SAVE_FILE)
             logger.info(f"Waiting for {UPDATE_DELAY} seconds before the next check...")
             countdown(UPDATE_DELAY)
 
-            save_data(channels, SAVE_FILE)
+            
 
     except KeyboardInterrupt:
         logger.info("Process interrupted by user. Saving data and exiting...")
