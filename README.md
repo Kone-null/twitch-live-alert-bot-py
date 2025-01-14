@@ -108,3 +108,10 @@ Start the bot with the following command:
 ```bash
 python bot.py
 ```
+
+
+## Server Version Usage
+```bash
+uvicorn server:app --reload
+```
+
