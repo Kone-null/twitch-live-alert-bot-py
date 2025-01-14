@@ -110,7 +110,10 @@ python bot.py
 ```
 
 
-## Server Version Usage
+## Running the Server 
+
+Start the server verion of the bot with the following command:
+
 ```bash
 uvicorn server:app --reload
 ```
