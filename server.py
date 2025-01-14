@@ -148,6 +148,14 @@ def send_webhook(channel_name: str, status: str) -> None:
     try:
         detect_time = int(time.time())
         webhook = SyncWebhook.from_url(DISCORD_WEBHOOK_URL)
+
+
+        live_message = f"<@&{TWITCH_ROLE_ID}> <t:{detect_time}:F> <t:{detect_time}:R> - [{channel_name}]({'https://www.twitch.tv/'+channel_name}) is {status}!"
+        
+        offline_message = f"<@&{TWITCH_ROLE_ID}> <t:{detect_time}> <t:{detect_time}:R> - {channel_name} is {status}!"
+
+        message = live_message if status == "live" else offline_message
+
         message = f"<@&{TWITCH_ROLE_ID}> <t:{detect_time}:F> <t:{detect_time}:R> - [{channel_name}]({'https://www.twitch.tv/'+channel_name}) is {status}!"
         webhook.send(message)
         logger.discord(f"Sent {status} status for {channel_name} to Discord.")
