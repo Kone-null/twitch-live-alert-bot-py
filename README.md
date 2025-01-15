@@ -59,6 +59,8 @@ UPDATE_DELAY_MIN=
 SAVE_FILE="save_data.json"
 CLIENT_ID=
 AUTH_KEY=
+KEY_EXPIRE=
+SECRET=
 ```
 
 ### Configuration Details:
