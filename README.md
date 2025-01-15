@@ -11,17 +11,7 @@ Developed using Python 3.12.
 
 ## How It Works
 
-This bot does not use the Twitch API. Instead, it checks a channel's live status by sending a GET request to `https://www.twitch.tv/[channel_name]`. The response HTML includes a boolean value `isLiveBroadcast`, which determines the live status of the channel:
-
-- If `isLiveBroadcast` exists in the response, the channel is live.
-- If `isLiveBroadcast` is not found, the channel is offline.
-
-This known [issue](https://github.com/Kone-null/twitch-live-alert-bot-py/issues/8#issue-2670486935) as been worked out.
-
-#### Update:
-The current version integrates the Twitch API. 
-An API request is made, and a JSON response is returned. The `is_live` field is parsed, returning a boolean value that indicates the channel's live status.
-
+This bot & server equivalent uses the Twitch API. Instead, it checks a channel's live status by sending a GET request to the `https://api.twitch.tv/helix/search` API endpoint. The response HTML includes a boolean value `is_live`, which determines the live status of the channel.
 
 ---
 
